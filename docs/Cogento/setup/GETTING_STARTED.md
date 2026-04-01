@@ -53,6 +53,25 @@ SHARED_SUPERUSER_EMAIL=admin@yourdomain.com
 STRIPE_KEY_ENCRYPTION_KEY=your-encryption-key-here
 ```
 
+**License trial key (optional but recommended):**  
+If set, every **new tenant** gets an auto-generated **trial license** (100 Stripe customers, 30 days). Without these keys, new tenants have no license and member sync/list are capped at 0 until you set a free-tier or premium token.
+
+```bash
+# Generate a trial key pair (run once, then put the contents in .env)
+openssl genrsa -out trial_private.pem 2048
+openssl rsa -in trial_private.pem -pubout -out trial_public.pem
+
+# Add to .env (paste the full PEM content; newlines can be \n)
+# LICENSE_TRIAL_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----
+# ... contents of trial_public.pem ...
+# -----END PUBLIC KEY-----"
+# LICENSE_TRIAL_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
+# ... contents of trial_private.pem ...
+# -----END PRIVATE KEY-----"
+```
+
+Keep `trial_private.pem` secure and do not commit it to version control. The public key is used by the app to verify tokens; the private key is used only when creating a new tenant to sign the trial token.
+
 **Email Configuration (for login codes):**
 ```bash
 MAIL_USERNAME=your-email@gmail.com
@@ -152,6 +171,8 @@ From the shared superuser landing page, click **"Tenants"** or navigate to:
 3. Click **"Create Tenant"**
 
 The tenant record is now created in the `cogento_shared` database.
+
+**License (trial):** If you set the **License trial key** in Step 2, the new tenant automatically receives a **trial license** (100 Stripe customers, 30 days). The **License** column on the Tenants page will show "Set". If the trial keys are not set, the tenant has no license until you add a free-tier or premium token later.
 
 ### 6.3 Create Tenant Database
 
