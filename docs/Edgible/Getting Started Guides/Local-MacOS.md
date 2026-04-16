@@ -220,8 +220,9 @@ The **serving agent** may try to health-check an **`appId`** the **API** knows a
 
 ### Verify / test (step 5)
 
-- [ ] **`edgible app list`** includes your demo app.
+- [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** tied to your account/device in a way that matches the CLI.
+- [ ] **Internet (off-LAN):** On a **device that is not on your local network**—for example a **smartphone on cellular/mobile data** with **Wi‑Fi off** or **not** connected to your home Wi‑Fi—open a browser and go to the **URL** shown by **`edgible app ls`**, or build **`http://` or `https://`** + **Serving IP** + **`:`** + **Port** to match the CLI. You should see the same **nginx** welcome page as on your Mac, proving the app is **reachable from the internet**, not only on your LAN. If it does not load yet, wait briefly for Edgible routing to settle, confirm **`edgible app status`** shows **active**, and retry.
 
 ---
 
@@ -232,10 +233,10 @@ Do these in a sensible order for your machine (stop workloads before removing th
 ### 6.1 Application (if you created one in step 5)
 
 ```bash
-edgible application delete --name "<your-app-name>"
+edgible app delete
 ```
 
-Or **`--app-id`** from **`edgible app list`**. See **`edgible application delete --help`**.
+The CLI shows a **pick list** of applications; choose the one you created in step **5**. See **`edgible app delete --help`** for non-interactive flags (for example **`--app-id`**) if you need scripting.
 
 ### 6.2 Agent
 

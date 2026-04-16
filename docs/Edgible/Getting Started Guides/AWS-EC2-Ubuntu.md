@@ -272,8 +272,9 @@ Until the CLI (or agent sync) wires that up end-to-end: use **`sudo edgible agen
 
 ### Verify / test (step 5)
 
-- [ ] **`edgible app list`** includes your demo app.
+- [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** in a way that matches the CLI.
+- [ ] **Internet (off-LAN):** On a **device that is not on the same LAN as your laptop** (for example a **smartphone on cellular/mobile data** with **Wi‑Fi off** or **not** on your home/office Wi‑Fi), open a browser and go to the **URL** from **`edgible app ls`**, or **`http://` / `https://`** + **Serving IP** + **`:`** + **Port** as printed. You should see the same **nginx** welcome page as when you opened **`http://<instance-public-ip>/`** in step **1**, proving Edgible is **hosting the workload on the internet**, not only inside your VPC or local browser session. If it fails at first, wait for routing to propagate, check **`edgible app status`**, and retry.
 
 ---
 
@@ -282,10 +283,10 @@ Until the CLI (or agent sync) wires that up end-to-end: use **`sudo edgible agen
 ### 6.1 Application (if created in step 5)
 
 ```bash
-edgible application delete --name "<your-app-name>"
+edgible app delete
 ```
 
-Or **`--app-id`** from **`edgible app list`**.
+The CLI shows a **pick list** of applications; choose the one you created in step **5**. See **`edgible app delete --help`** for non-interactive flags (for example **`--app-id`**) if you need scripting.
 
 ### 6.2 Agent
 

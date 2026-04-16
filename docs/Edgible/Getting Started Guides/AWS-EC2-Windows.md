@@ -298,8 +298,9 @@ If you hit **`Application handler not found`** / **`Handler not found`**, see th
 
 ### Verify / test (step 5)
 
-- [ ] **`edgible app list`** includes your demo app.
+- [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** consistently with the CLI.
+- [ ] **Internet (off-LAN):** On a **device that is not on the same LAN as the machine you use for RDP** (for example a **smartphone on cellular/mobile data** with **Wi‑Fi off** or **not** on your home/office Wi‑Fi), open a browser and go to the **URL** from **`edgible app ls`**, or **`http://` / `https://`** + **Serving IP** + **`:`** + **Port** as printed. You should see the same **IIS** default page as when you opened **`http://<instance-public-ip>/`** in step **1**, proving Edgible is **hosting the workload on the internet**. If it fails at first, wait for routing to propagate, check **`edgible app status`**, and retry.
 
 ---
 
@@ -308,10 +309,10 @@ If you hit **`Application handler not found`** / **`Handler not found`**, see th
 ### 6.1 Application (if created in step 5)
 
 ```powershell
-edgible application delete --name "<your-app-name>"
+edgible app delete
 ```
 
-Or **`--app-id`** from **`edgible app list`**.
+The CLI shows a **pick list** of applications; choose the one you created in step **5**. See **`edgible app delete --help`** for non-interactive flags (for example **`--app-id`**) if you need scripting.
 
 ### 6.2 Agent
 
