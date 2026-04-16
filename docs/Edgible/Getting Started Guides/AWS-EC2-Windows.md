@@ -294,7 +294,7 @@ edgible app status
 
 **`edgible app status`** is an alias for **`edgible app get`**. With multiple apps, use **`--app-id`** / **`-i`**.
 
-If you hit **`Application handler not found`** / **`Handler not found`**, see the troubleshooting note in **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** (same class of issue).
+If you hit **`Application handler not found`** / **`Handler not found`**, use **`edgible agent logs -f`**, **`edgible device application-health --help`**, and the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for visibility; confirm **`edgible app status`** and the **Dashboard** agree on device and app state.
 
 ### Verify / test (step 5)
 

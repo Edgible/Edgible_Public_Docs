@@ -264,12 +264,6 @@ edgible app status
 
 **`edgible app status`** is an **alias** for **`edgible app get`**. With multiple applications, pass **`--app-id`** (or **`-i`**) from **`edgible app list`**.
 
-### Troubleshooting — agent log: `Application handler not found` / `Workload status check failed: Handler not found`
-
-That message means the **serving agent** is trying to health-check an **`appId`** the **Edgible API** knows about, but the agent process has **no local handler** registered for that application yet. In the current **`@edgible-team/cli`** tree, **`edgible app create existing`** creates the application via the **API** but **does not** always run the same **“configure local agent for this application”** step that other onboarding flows use—so **`sudo systemctl restart edgible-agent`** alone often **does not** fix reachability.
-
-Until the CLI (or agent sync) wires that up end-to-end: use **`sudo edgible agent logs -f`** and **`edgible device application-health`** (see **`edgible device application-health --help`**) for visibility, confirm **`edgible app status`** shows the app on the right **device**, and follow **internal / support** guidance for your org—or patch the CLI to call local agent configuration after **`create existing`**. Edgible may ship an updated CLI before this note is removed.
-
 ### Verify / test (step 5)
 
 - [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).

@@ -216,7 +216,7 @@ edgible app status
 
 ### Troubleshooting — `Application handler not found` / `Handler not found`
 
-The **serving agent** may try to health-check an **`appId`** the **API** knows about before local handler wiring completes. Use **`sudo edgible agent logs -f`**, **`edgible device application-health --help`**, and the longer note in **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** (same class of issue on Linux EC2).
+The **serving agent** may try to health-check an **`appId`** the **API** knows about before local handler wiring completes. Use **`sudo edgible agent logs -f`**, **`edgible device application-health --help`**, and the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for next steps.
 
 ### Verify / test (step 5)
 
