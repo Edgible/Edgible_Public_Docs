@@ -17,7 +17,7 @@ For the **same six steps** **on your Mac** without EC2, see **[Local-MacOS.md](L
 | **5.** | **Register the sample container as an Edgible app** (**CLI** + **Dashboard**) |
 | **6.** | **Teardown** (Edgible app / agent / CLI; stop/remove container; **terminate EC2**) |
 
-Each step ends with **Verify / test**.
+Each step ends with **Verify**.
 
 ## Why EC2 for a sandbox
 
@@ -129,7 +129,7 @@ When **`docker ps`** shows the container **Up**, open **`http://<instance-public
 
 **Important:** **Keep `edgible-demo-nginx` running** through steps **4** and **5**. Do not **`docker stop`** / **`docker rm`** until **step 6** (or you intentionally recreate it).
 
-### Verify / test (step 1)
+### Verify
 
 - [ ] **`docker version`** and **`docker run --rm hello-world`** succeed (or **`sudo docker …`** if the group is not active yet).
 - [ ] Browser loads **Welcome to nginx!** at **`http://<instance-public-ip>/`**.
@@ -172,7 +172,7 @@ sudo npm install -g @edgible-team/cli
 
 Using **`sudo`** with **`-g`** avoids permission errors on stock Ubuntu; alternatively configure **`npm prefix`** to a directory owned by **`ubuntu`** (see npm docs).
 
-### Verify / test (step 2)
+### Verify
 
 ```bash
 edgible --version
@@ -195,7 +195,7 @@ On your **local laptop or desktop** (the machine with a browser—not only over 
 3. Choose **Sign up here** (or equivalent) for a **new** account, or **sign in** if you already have one.
 4. After success you should land on the **Dashboard**. Keep it open for **steps 4** and **5** to compare with the CLI on the EC2 host.
 
-**Verify / test (3.1)**
+**Verify**
 
 - [ ] You see the **Dashboard** while logged in.
 
@@ -207,7 +207,7 @@ Needs outbound **HTTPS** from the instance (default security group egress usuall
 edgible auth login
 ```
 
-**Verify / test (3.2)**
+**Verify**
 
 - [ ] **`edgible auth login`** completes without errors.
 
@@ -236,7 +236,7 @@ Add **`--watch`** on **`agent status`** (**Ctrl+C** to stop). Follow logs: **`su
 
 This sandbox doc does not replace full self-hosting runbooks; see the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for agent details.
 
-### Verify / test (step 4)
+### Verify
 
 - [ ] **`sudo edgible agent status`** shows a healthy agent.
 - [ ] **Dashboard** reflects this **device** in line with the CLI.
@@ -264,7 +264,7 @@ edgible app status
 
 **`edgible app status`** is an **alias** for **`edgible app get`**. With multiple applications, pass **`--app-id`** (or **`-i`**) from **`edgible app list`**.
 
-### Verify / test (step 5)
+### Verify
 
 - [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** in a way that matches the CLI.
@@ -323,7 +323,7 @@ Follow Docker’s docs for leftover **`/var/lib/docker`** if you need disk recla
 
 **Dashboard:** After teardown, refresh the **Dashboard**; device/application rows should update as Edgible’s backend syncs.
 
-### Verify / test (step 6)
+### Verify
 
 - [ ] Instance **terminated** (or stopped) and billing risk understood.
 - [ ] No demo container / agent / CLI left **if** you intended full cleanup.

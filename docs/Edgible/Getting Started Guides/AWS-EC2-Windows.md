@@ -19,7 +19,7 @@ To evaluate **Docker + Linux containers** entirely **on a Mac** (no Windows EC2)
 | **5.** | **Register the sample container as an Edgible app** (**CLI** + **Dashboard**) |
 | **6.** | **Teardown** (Edgible app / agent / CLI; stop/remove container; **terminate EC2**) |
 
-Each step ends with **Verify / test**.
+Each step ends with **Verify**.
 
 ## Why EC2 for a sandbox
 
@@ -125,7 +125,7 @@ docker run --rm mcr.microsoft.com/windows/nanoserver:ltsc2022 hostname
 
 Use **`ltsc2025`** for **nanoserver** on Windows Server **2025** if that tag exists on MCR.
 
-### Verify / test (step 1)
+### Verify
 
 - [ ] **`docker version`** succeeds.
 - [ ] Browser shows the **default IIS** page at **`http://<instance-public-ip>/`**.
@@ -201,7 +201,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine -Force
 
 Then try again in a new window.
 
-### Verify / test (step 2)
+### Verify
 
 ```powershell
 edgible --version
@@ -224,7 +224,7 @@ On your **local machine** (Mac or PC with a browser—you can use RDP’s clipbo
 3. Choose **Sign up here** (or equivalent) for a **new** account, or **sign in** if you already have one.
 4. Land on the **Dashboard**. Keep it open for **steps 4** and **5** to compare with the **Windows Server** host where the CLI runs.
 
-**Verify / test (3.1)**
+**Verify**
 
 - [ ] You see the **Dashboard** while logged in.
 
@@ -236,7 +236,7 @@ Interactive login (needs outbound **HTTPS** to Edgible):
 edgible auth login
 ```
 
-**Verify / test (3.2)**
+**Verify**
 
 - [ ] **`edgible auth login`** completes without errors.
 
@@ -268,7 +268,7 @@ edgible agent logs -f
 
 Use **`edgible agent logs -n 200`** for a snapshot; **`edgible agent logs --help`** lists filters.
 
-### Verify / test (step 4)
+### Verify
 
 - [ ] **`edgible agent status`** shows a healthy agent.
 - [ ] **Dashboard** reflects this **device**.
@@ -296,7 +296,7 @@ edgible app status
 
 If you hit **`Application handler not found`** / **`Handler not found`**, use **`edgible agent logs -f`**, **`edgible device application-health --help`**, and the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for visibility; confirm **`edgible app status`** and the **Dashboard** agree on device and app state.
 
-### Verify / test (step 5)
+### Verify
 
 - [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** consistently with the CLI.
@@ -349,7 +349,7 @@ Only if you want the instance clean of Docker before terminate—follow Microsof
 
 **Dashboard:** Refresh after teardown; rows should update as Edgible’s backend syncs.
 
-### Verify / test (step 6)
+### Verify
 
 - [ ] Instance **terminated** (or stopped) and billing risk understood.
 - [ ] Demo container / agent / CLI removed **if** you intended full cleanup.

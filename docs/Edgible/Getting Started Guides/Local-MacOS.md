@@ -21,7 +21,7 @@ For **isolation** and **no local installs**, use a cloud sandbox: **[AWS-EC2-Ubu
 | **5.** | **Register the sample container as an Edgible app** (**CLI** + **Dashboard**) |
 | **6.** | **Teardown** (Edgible app / agent / CLI; optional Docker removal) |
 
-Each step ends with **Verify / test**.
+Each step ends with **Verify**.
 
 ## Before you start (Mac-specific)
 
@@ -85,7 +85,7 @@ docker run -d --name edgible-demo-nginx -p 80:80 nginx:alpine
 
 **Important:** **Keep `edgible-demo-nginx` running** through steps **4** and **5**. Do not **`docker stop`** / **`docker rm`** it until you begin **step 6** (or you intentionally recreate it).
 
-### Verify / test (step 1)
+### Verify
 
 - [ ] **`docker version`** and **`docker run --rm hello-world`** succeed (no “Cannot connect to the Docker daemon”).
 - [ ] Browser shows **Welcome to nginx!** on the URL you chose (**127.0.0.1** with the right port).
@@ -123,7 +123,7 @@ npm install -g @edgible-team/cli
 
 If **`npm install -g`** fails with **permission denied**, fix npm’s global prefix (see npm docs) or use **nvm** (recommended). Avoid **`sudo npm install -g`** unless you accept **root-owned** global packages.
 
-### Verify / test (step 2)
+### Verify
 
 ```bash
 edgible --version
@@ -146,7 +146,7 @@ You need an **Edgible account** in the browser (so you have a **Dashboard**), th
 3. On the Edgible auth screen, choose **Sign up here** (or equivalent) if you need a **new** account, or **sign in** if you already have credentials.
 4. After authentication you should land on the **Dashboard**—the browser home for your account, **devices**, and **applications**. Keep this tab handy for **steps 4** and **5**: you can confirm CLI actions (new device, app registration) here as well as in the terminal.
 
-**Verify / test (3.1)**
+**Verify**
 
 - [ ] While logged in, you see the **Dashboard** (not only the marketing homepage).
 
@@ -158,7 +158,7 @@ edgible auth login
 
 Complete the flow the CLI prints (often a browser/device code). Needs outbound **HTTPS**.
 
-**Verify / test (3.2)**
+**Verify**
 
 - [ ] **`edgible auth login`** completes without errors.
 - [ ] Optional: run a read-only command such as **`edgible app list`** (may be empty) to confirm the session.
@@ -188,7 +188,7 @@ Add **`--watch`** on **`agent status`** for live updates (**Ctrl+C** to stop). F
 
 See **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for **`agent install`**, log filters, and troubleshooting.
 
-### Verify / test (step 4)
+### Verify
 
 - [ ] **`sudo edgible agent status`** shows a healthy agent (per CLI output).
 - [ ] **Dashboard** lists this machine as a **device** (or shows expected registration state—wording may vary by Edgible version).
@@ -218,7 +218,7 @@ edgible app status
 
 The **serving agent** may try to health-check an **`appId`** the **API** knows about before local handler wiring completes. Use **`sudo edgible agent logs -f`**, **`edgible device application-health --help`**, and the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for next steps.
 
-### Verify / test (step 5)
+### Verify
 
 - [ ] **`edgible app ls`** (same command as **`edgible app list`**) lists your demo app. Note the **Serving IP**, **Port**, **Protocol**, and the **URL** line in the output (or run **`edgible app ls --json`** if you need machine-readable fields).
 - [ ] **Dashboard** shows the **application** tied to your account/device in a way that matches the CLI.
@@ -266,7 +266,7 @@ If you installed **Docker Desktop** only for this evaluation: **Quit Docker**, t
 
 **Dashboard:** You can sign out or leave the account as-is; devices/apps removed from the host may still show until Edgible’s backend catches up—refresh the **Dashboard** after a short wait.
 
-### Verify / test (step 6)
+### Verify
 
 - [ ] No **`edgible-demo-nginx`** in **`docker ps -a`** (if you removed it).
 - [ ] **`edgible`** not on **`PATH`** (if you uninstalled the CLI).
