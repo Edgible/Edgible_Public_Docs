@@ -1,8 +1,8 @@
 # Local example: Evaluate Edgible on your Mac (macOS)
 
-This guide is **macOS on your own Mac only** (MacBook, Mac mini, Mac Studio, etc.). You use **Docker** with a **small Linux container** you can open in a browser, then optional **Node.js** and the **Edgible CLI** (`@edgible-team/cli`). It mirrors the flow in **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** but runs **on your machine** instead of a disposable cloud VM.
+This guide is **macOS on your own Mac only** (MacBook, Mac mini, Mac Studio, etc.). It follows the same **numbered steps** as **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** and **[AWS-EC2-Windows.md](AWS-EC2-Windows.md)** so you can compare **local Mac**, **Linux EC2**, and **Windows EC2** side by side.
 
-For **isolation** and **no local installs**, use a cloud sandbox instead: **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** (Linux / SSH) or **[AWS-EC2-Windows.md](AWS-EC2-Windows.md)** (Windows Server / RDP).
+For **isolation** and **no local installs**, use a cloud sandbox: **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** or **[AWS-EC2-Windows.md](AWS-EC2-Windows.md)**.
 
 ## Why use your Mac
 
@@ -10,26 +10,41 @@ For **isolation** and **no local installs**, use a cloud sandbox instead: **[AWS
 - **Familiar tooling:** Same **Linux containers** as many production paths (**`nginx:alpine`** here).
 - **Tradeoffs:** Workloads share your Mac’s CPU, RAM, and disk; mistakes affect **your** user account unless you use VMs separately. This is a **dev / evaluation** path, not a substitute for hardened production hosting.
 
-## What you will run
+## How this guide is structured (repeatable framework)
 
-1. **Docker Desktop** (or another **Docker Engine** backend for Mac you already use), then **`nginx:alpine`** mapped to a host port so **`http://127.0.0.1:<port>/`** works in a browser.
-2. **Node.js LTS** and **`npm install -g @edgible-team/cli`**.
-3. **Optional:** **`edgible auth login`**, then **`sudo edgible agent install`**, then **`edgible app create existing`** on the **still-running** nginx container (**do not** stop/remove it before that step), then **`edgible app status`** (or **`edgible app list`**). Full command reference: **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)**.
+| Step | What you do |
+|------|----------------|
+| **1.** | **Docker** and a **sample web workload** in a container (browser check) |
+| **2.** | **Node.js** and **`@edgible-team/cli`** |
+| **3.** | **Edgible account** in the browser (**Dashboard**), then **CLI authentication** |
+| **4.** | **Install and run the Edgible agent** (CLI; **Dashboard** shows your device) |
+| **5.** | **Register the sample container as an Edgible app** (**CLI** + **Dashboard**) |
+| **6.** | **Teardown** (Edgible app / agent / CLI; optional Docker removal) |
 
-## Before you start
+Each step ends with **Verify / test**.
+
+## Before you start (Mac-specific)
 
 | Topic | Notes |
 |--------|--------|
 | **macOS version** | Use a **currently supported** macOS release. Older macOS may not run current Docker Desktop builds. |
-| **Apple Silicon (M1/M2/M3/…)** vs **Intel** | **`nginx:alpine`** is multi-arch; no extra steps for this demo. If you pull **x86-only** images on Apple Silicon, you may need **Rosetta** / **`platform: linux/amd64`**—not required here. |
-| **Administrator access** | Installing **Docker Desktop** and optional **Edgible agent** system components may prompt for an **administrator password**. |
-| **VPN / corporate proxy** | Docker pulls and **`edgible auth login`** need working **HTTPS** outbound; adjust per your org’s policy. |
+| **Apple Silicon (M1/M2/M3/…)** vs **Intel** | **`nginx:alpine`** is multi-arch; no extra steps for this demo. |
+| **Administrator access** | **Docker Desktop** and the **Edgible agent** may prompt for an **administrator password**. |
+| **VPN / corporate proxy** | Docker pulls and **`edgible auth login`** need working **HTTPS** outbound. |
 
-## Install Docker (macOS)
+### macOS firewall (optional)
 
-Follow the vendor’s current docs if these steps drift.
+If **System Settings** → **Network** → **Firewall** blocks local services, allow **Docker** / **com.docker.backend** when prompted, or temporarily test with the firewall off **only** on a trusted home network.
 
-### Option A — Docker Desktop (recommended for this guide)
+---
+
+## 1. Docker (and nginx sample)
+
+Follow the vendor’s current docs if these drift.
+
+### Install Docker on macOS
+
+**Option A — Docker Desktop (recommended)**
 
 1. Download **Docker Desktop for Mac** from **[Install Docker Desktop on Mac](https://docs.docker.com/desktop/install/mac-install/)** (Apple Silicon vs Intel installers differ).
 2. Open the **`.dmg`**, drag **Docker** to **Applications**, launch **Docker**, and complete the first-run wizard.
@@ -41,69 +56,51 @@ Follow the vendor’s current docs if these steps drift.
 brew install --cask docker
 ```
 
-Then start **Docker** from **Applications** (or Spotlight) once; the cask does not always auto-start the app.
+Then start **Docker** from **Applications** (or Spotlight) once.
 
-### Option B — Other engines (advanced)
+**Option B — Other engines (advanced)**
 
-If you already run **Colima**, **Rancher Desktop**, or **OrbStack** with a **Docker CLI** that talks to a Linux VM, you can use that instead of Docker Desktop—ensure **`docker version`** works from **Terminal** before continuing.
+If you already run **Colima**, **Rancher Desktop**, or **OrbStack** with a **Docker CLI** that talks to a Linux VM, use that instead—ensure **`docker version`** works from **Terminal**.
 
-Verify:
+### Run the sample container (`nginx:alpine`)
 
-```bash
-docker version
-docker run --rm hello-world
-```
+**Pick a host port**
 
-If **`Cannot connect to the Docker daemon`**, the Docker engine is not running—start **Docker Desktop** (or your Colima/Rancher/OrbStack stack) and retry.
-
-## Sample web app: nginx in a Linux container
-
-**1. Pick a host port**
-
-- **Port 80** often works with **Docker Desktop** as **`http://127.0.0.1/`**.
-- If **80** is in use or your browser shows a conflict, use **8080** (or any free high port):
+- **Port 80** often works as **`http://127.0.0.1/`**.
+- If **80** is in use, use **8080**:
 
 ```bash
 docker run -d --name edgible-demo-nginx -p 8080:80 nginx:alpine
 ```
 
-For **80** explicitly:
+Or for **80**:
 
 ```bash
 docker run -d --name edgible-demo-nginx -p 80:80 nginx:alpine
 ```
 
-**2. Open in a browser**
+**Open in a browser:** **`http://127.0.0.1/`** (port **80**) or **`http://127.0.0.1:8080/`** (port **8080**).
 
-- **`http://127.0.0.1/`** if you mapped **`-p 80:80`**.
-- **`http://127.0.0.1:8080/`** if you mapped **`-p 8080:80`**.
+**Logs (optional):** **`docker logs edgible-demo-nginx`**.
 
-**3. Logs** (optional):
+**Important:** **Keep `edgible-demo-nginx` running** through steps **4** and **5**. Do not **`docker stop`** / **`docker rm`** it until you begin **step 6** (or you intentionally recreate it).
 
-```bash
-docker logs edgible-demo-nginx
-```
+### Verify / test (step 1)
 
-**Keep this container running** if you continue with **`edgible app create existing`** below: that flow expects a **live** workload. **Do not** **`docker stop`** / **`docker rm`** **`edgible-demo-nginx`** until you are finished with Edgible for this session.
+- [ ] **`docker version`** and **`docker run --rm hello-world`** succeed (no “Cannot connect to the Docker daemon”).
+- [ ] Browser shows **Welcome to nginx!** on the URL you chose (**127.0.0.1** with the right port).
 
-**4. Stop and remove nginx** when you are done:
+---
 
-```bash
-docker stop edgible-demo-nginx
-docker rm edgible-demo-nginx
-```
-
-## macOS firewall (optional)
-
-If **System Settings** → **Network** → **Firewall** blocks local services, allow **Docker** / **com.docker.backend** when prompted, or temporarily test with the firewall off **only** on a trusted home network. Prefer **narrow rules** over turning security off globally.
-
-## Install Node.js LTS
+## 2. Node.js and Edgible CLI
 
 The Edgible CLI needs **Node.js 16+** and **npm**.
 
+### Install Node.js LTS
+
 Pick **one** approach:
 
-### A — **nvm** (clean global npm without `sudo`)
+**A — nvm** (clean global npm without `sudo`)
 
 Use the current install command from **[nvm — Installing and updating](https://github.com/nvm-sh/nvm#installing-and-updating)** (one-liner **`curl … | bash`**), then restart the shell or **`source ~/.zshrc`** (or **`~/.bashrc`**):
 
@@ -114,85 +111,164 @@ node --version
 npm --version
 ```
 
-### B — **Homebrew**
+**B — Homebrew:** **`brew install node`**
 
-```bash
-brew install node
-node --version
-npm --version
-```
+**C — Official installer:** **[https://nodejs.org](https://nodejs.org)** LTS **`.pkg`**.
 
-### C — **Official installer**
-
-Download the **LTS** **`.pkg`** from **[https://nodejs.org](https://nodejs.org)** and install.
-
-## Install the Edgible CLI globally
-
-If **`npm install -g`** fails with **permission denied** on stock **Homebrew Node**, either fix npm’s global prefix (see npm docs) or install under your user via **nvm** (recommended above).
+### Install the CLI globally
 
 ```bash
 npm install -g @edgible-team/cli
 ```
 
-If you deliberately use **`sudo npm install -g …`**, understand it mixes **root-owned** files into global npm; **nvm** avoids that.
+If **`npm install -g`** fails with **permission denied**, fix npm’s global prefix (see npm docs) or use **nvm** (recommended). Avoid **`sudo npm install -g`** unless you accept **root-owned** global packages.
 
-Verify:
+### Verify / test (step 2)
 
 ```bash
 edgible --version
 edgible --help
 ```
 
-## First-time sign-in (optional)
+- [ ] **`node --version`** shows **16+**.
+- [ ] **`edgible --version`** prints a version string.
+
+---
+
+## 3. Edgible sign-up and `edgible auth login`
+
+You need an **Edgible account** in the browser (so you have a **Dashboard**), then you link the **CLI** on this Mac with **`edgible auth login`**.
+
+### 3.1 Browser: create or open your account (Dashboard)
+
+1. Open **[https://www.edgible.com](https://www.edgible.com)** in a browser (or **[https://www.edgible.com/signup](https://www.edgible.com/signup)** to go straight to sign-up).
+2. Click **Login** (typically **top right** on the public site).
+3. On the Edgible auth screen, choose **Sign up here** (or equivalent) if you need a **new** account, or **sign in** if you already have credentials.
+4. After authentication you should land on the **Dashboard**—the browser home for your account, **devices**, and **applications**. Keep this tab handy for **steps 4** and **5**: you can confirm CLI actions (new device, app registration) here as well as in the terminal.
+
+**Verify / test (3.1)**
+
+- [ ] While logged in, you see the **Dashboard** (not only the marketing homepage).
+
+### 3.2 CLI: authenticate this machine
 
 ```bash
 edgible auth login
 ```
 
+Complete the flow the CLI prints (often a browser/device code). Needs outbound **HTTPS**.
+
+**Verify / test (3.2)**
+
+- [ ] **`edgible auth login`** completes without errors.
+- [ ] Optional: run a read-only command such as **`edgible app list`** (may be empty) to confirm the session.
+
 More auth options: **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** (*First-time setup*, *Authentication*).
 
-## Install the Edgible agent on this Mac (optional)
+---
 
-After **`edgible auth login`**, the installer may need elevated rights to register **LaunchDaemon**s and system paths:
+## 4. Start the Edgible agent
+
+Install the **agent** so this Mac can register as a **device** and run Edgible workloads. Use **`sudo`** so the installer can place **LaunchDaemon**s and system paths:
 
 ```bash
 sudo edgible agent install
 ```
 
-Check status (use **`sudo`** consistently if the installer stored root-owned config, mirroring the **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** flow):
+**Dashboard:** After the agent registers, refresh the **Dashboard** and look for this **device** (hostname / labels depend on Edgible UI). If something looks wrong, fix the CLI first, then re-check the Dashboard—they should agree.
+
+**Status and logs** (use **`sudo`** consistently if the installer used root-owned config, same pattern as **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)**):
 
 ```bash
 sudo edgible agent status
 sudo edgible agent logs -n 200
 ```
 
-See the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for agent details and log options.
+Add **`--watch`** on **`agent status`** for live updates (**Ctrl+C** to stop). For streaming logs: **`sudo edgible agent logs -f`**.
 
-## Register the running nginx as an Edgible application (optional)
+See **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** for **`agent install`**, log filters, and troubleshooting.
 
-With **`edgible-demo-nginx` still up** and the same port you chose (**80** or **8080**), after **sign-in** and **agent install**:
+### Verify / test (step 4)
+
+- [ ] **`sudo edgible agent status`** shows a healthy agent (per CLI output).
+- [ ] **Dashboard** lists this machine as a **device** (or shows expected registration state—wording may vary by Edgible version).
+
+---
+
+## 5. Create an Edgible application (from the running container)
+
+With **`edgible-demo-nginx` still running** and **steps 3–4** complete:
 
 ```bash
 edgible app create existing
 ```
 
-Choose the **nginx** workload and the **container port** exposed to clients (**80** inside the container). If you published the host as **8080→80**, follow CLI prompts so the app’s public URL matches how you reach it (see **`edgible application create existing --help`** and the **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)**).
+**`app`** is a short alias for **`application`**. The CLI prompts for an **application name**, **serving device** (this Mac, once registered), **workload** (choose **`edgible-demo-nginx`**), and **port** (**80** inside the container). If you mapped the host to **8080→80**, follow prompts and **`edgible application create existing --help`** so public access matches how you browse locally.
 
-Inspect apps:
+**Dashboard:** Open or refresh the **Dashboard** and find the new **application** alongside the **device**. You can cross-check **`edgible app list`** / **`edgible app status`** with what the UI shows.
 
 ```bash
 edgible app list
 edgible app status
 ```
 
-**Troubleshooting — agent log: `Application handler not found` / `Workload status check failed: Handler not found`**
+**`edgible app status`** is an alias for **`edgible app get`**. With multiple apps, use **`--app-id`** / **`-i`** from **`edgible app list`**.
 
-Same class of issue as on **Ubuntu EC2**: **`edgible app create existing`** registers the app with the **API** but local wiring can lag what the agent expects. Use **`sudo edgible agent logs -f`**, **`edgible device application-health`**, and org support guidance; see the note in **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** for the longer explanation.
+### Troubleshooting — `Application handler not found` / `Handler not found`
 
-## When you are done
+The **serving agent** may try to health-check an **`appId`** the **API** knows about before local handler wiring completes. Use **`sudo edgible agent logs -f`**, **`edgible device application-health --help`**, and the longer note in **[AWS-EC2-Ubuntu.md](AWS-EC2-Ubuntu.md)** (same class of issue on Linux EC2).
 
-1. **Optional:** **`docker stop edgible-demo-nginx`** and **`docker rm edgible-demo-nginx`**.
-2. **Optional:** remove the global CLI (**`npm uninstall -g @edgible-team/cli`**) if you no longer want it.
-3. **Quit Docker Desktop** (or stop Colima/Rancher/OrbStack) if you want Docker offloaded from memory.
+### Verify / test (step 5)
 
-That gives you a **local macOS** path to validate **Docker + nginx** and continue evaluating Edgible without AWS.
+- [ ] **`edgible app list`** includes your demo app.
+- [ ] **Dashboard** shows the **application** tied to your account/device in a way that matches the CLI.
+
+---
+
+## 6. Teardown (Edgible-related; optional Docker)
+
+Do these in a sensible order for your machine (stop workloads before removing the agent if your org recommends that).
+
+### 6.1 Application (if you created one in step 5)
+
+```bash
+edgible application delete --name "<your-app-name>"
+```
+
+Or **`--app-id`** from **`edgible app list`**. See **`edgible application delete --help`**.
+
+### 6.2 Agent
+
+```bash
+sudo edgible agent uninstall --remove-files
+```
+
+Confirm flags in **[Edgible CLI user guide](../../../../Edgible_Docs/Website/EDGIBLE_CLI_USER_GUIDE.md)** (`edgible agent uninstall`).
+
+### 6.3 CLI session and package
+
+```bash
+edgible auth logout
+npm uninstall -g @edgible-team/cli
+```
+
+### 6.4 Demo container
+
+```bash
+docker stop edgible-demo-nginx
+docker rm edgible-demo-nginx
+```
+
+### 6.5 Optional: remove Docker entirely
+
+If you installed **Docker Desktop** only for this evaluation: **Quit Docker**, then delete **Docker** from **Applications** (or **`brew uninstall --cask docker`**). Colima / OrbStack users should follow that product’s uninstall docs.
+
+**Dashboard:** You can sign out or leave the account as-is; devices/apps removed from the host may still show until Edgible’s backend catches up—refresh the **Dashboard** after a short wait.
+
+### Verify / test (step 6)
+
+- [ ] No **`edgible-demo-nginx`** in **`docker ps -a`** (if you removed it).
+- [ ] **`edgible`** not on **`PATH`** (if you uninstalled the CLI).
+- [ ] **Dashboard** no longer shows the device/app as active, or matches your expectations after uninstall.
+
+That gives you a **local macOS** path through the same **six steps** used in the EC2 guides.
