@@ -25,6 +25,8 @@ Each step ends with **Verify**.
 
 ## Before you start (Mac-specific)
 
+All **command-line** steps in this guide (**`docker`**, **`npm`**, **`edgible`**, **`sudo`**, etc.) are meant to be run **on your Mac** in **Terminal** (**Applications** → **Utilities** → **Terminal**). **iTerm2**, **Warp**, or another terminal app is fine if you already use one.
+
 | Topic | Notes |
 |--------|--------|
 | **macOS version** | Use a **currently supported** macOS release. Older macOS may not run current Docker Desktop builds. |
